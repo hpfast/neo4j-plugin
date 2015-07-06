@@ -1,15 +1,15 @@
-package org.waag.histograph;
+package org.waag.histograph.plugins;
 
-import org.neo4j.graphalgo.GraphAlgoFactory;
-import org.neo4j.graphalgo.PathFinder;
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.traversal.*;
 import org.neo4j.server.plugins.*;
-import org.neo4j.graphdb.traversal.Evaluators;
-import org.neo4j.graphdb.traversal.TraversalDescription;
-import org.neo4j.graphdb.traversal.Uniqueness;
+import org.neo4j.graphdb.traversal.Traverser;
+import org.waag.histograph.util.ValueComparator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+//import java.util.*;
+
 
 public class ExpandConcepts extends ServerPlugin {
 
@@ -20,7 +20,7 @@ public class ExpandConcepts extends ServerPlugin {
   @Name("expandConcepts")
   @Description("Maak klonten")
   @PluginTarget(GraphDatabaseService.class)
-  public Iterable<Path>  expandConcepts( @Source GraphDatabaseService graphDb,
+  public Iterable<String>  expandConcepts( @Source GraphDatabaseService graphDb,
                   @Description("Startnodes")
                     @Parameter(name = "ids", optional = false) String[] ids,
                   @Description("Klontvormende relaties")
@@ -137,13 +137,20 @@ public class ExpandConcepts extends ServerPlugin {
 //      feature.put("geometry", geometryObj);
 //      features.put(feature);
 //    }
-
-    ArrayList<Path> results = new ArrayList<Path>();
+    ArrayList<String> idsDone = new ArrayList<String>();
+    ArrayList<String> results = new ArrayList<String>();
 
     try (Transaction tx = graphDb.beginTx()) {
       for (String id : ids) {
 
+        // Create a map with <Node, nRels> pairs to sort nodes by the number of relationships later on
+        Map<String, Integer> nRelsMap = new HashMap<String, Integer>();
+        Set<Relationship> relSet = new HashSet<Relationship>();
+
         Node node = graphDb.findNode(DynamicLabel.label("_"), "id", id);
+
+//        nRelsMap.put(id, node.getDegree());
+        idsDone.add(id);
 
         if (node == null) {
           continue;
@@ -153,14 +160,35 @@ public class ExpandConcepts extends ServerPlugin {
             .breadthFirst()
             .relationships(Rels.hg_isUsedFor, Direction.BOTH)
             .relationships(Rels.hg_sameHgConcept, Direction.BOTH)
-            .uniqueness( Uniqueness.RELATIONSHIP_GLOBAL );
+            .uniqueness(Uniqueness.RELATIONSHIP_GLOBAL);
 
-        for ( Path path : td.traverse(node) )
-        {
-          results.add(path);
+        Traverser traverser =  td.traverse(node);
+
+        // Get all nodes found in each path, add them to the list if they weren't added before
+        for (Path path : traverser) {
+          Node endNode = path.endNode();
+          String hgidFound = endNode.getProperty("id").toString();
+
+          if (!idsDone.contains(hgidFound)) {
+            nRelsMap.put(hgidFound, endNode.getDegree());
+            idsDone.add(hgidFound);
+          }
         }
 
+        // Add relationships to a Set to filter out duplicates
+        for (Relationship r : traverser.relationships()) {
+          relSet.add(r);
+        }
 
+        // Sort nodes by #relationships
+        ValueComparator comparator = new ValueComparator(nRelsMap);
+        TreeMap<String, Integer> sortedMap = new TreeMap<String, Integer>(comparator);
+        sortedMap.putAll(nRelsMap);
+
+        // For each node in the Set (= hgConcept), create JSON output
+        for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
+          results.add(entry.getKey());
+        }
       }
     }
 
