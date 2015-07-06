@@ -10,5 +10,4 @@ neo4j start
 
 echo Installed plugin into $TARGET
 
-
 curl http://localhost:7474/db/data/ext/ExpandConcepts
