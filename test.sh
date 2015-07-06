@@ -1,3 +1,4 @@
-curl -X POST http://localhost:7474/db/data/ext/ExpandConcepts/node/326885/shortestPath \
+curl -s -X POST http://localhost:7474/db/data/ext/ExpandConcepts/graphdb/expandConcepts \
   -H "Content-Type: application/json" \
-  -d '{"target":"http://localhost:7474/db/data/node/321724", "depth":"10"}'
+  -d '{"ids": ["urn:hg:geonames:2753637", "urn:hg:geonames:2753639", "urn:hg:geonames:2753638", "urn:hg:geonames:2753640", "urn:hg:tgn:7264696", "urn:hg:tgn:term:1001511217", "urn:hg:geonames:2753636", "urn:hg:tgn:7264697", "urn:hg:tgn:7264700", "urn:hg:tgn:term:1001493884"]}' \
+| python -mjson.tool | pygmentize -l js
