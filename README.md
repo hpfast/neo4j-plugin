@@ -49,7 +49,7 @@ The plugin exposes a single endpoint - `/histograph/expand` - and expects a POST
 
 Example output of a single street in lovely Bussum. Response is an array of Histograph concepts, each concept contains an array of PITs:
 
-```
+```json
 [
   [
     {
