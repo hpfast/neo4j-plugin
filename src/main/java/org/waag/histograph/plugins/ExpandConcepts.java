@@ -10,7 +10,6 @@ import org.neo4j.graphdb.traversal.Traverser;
 import org.neo4j.graphdb.traversal.Uniqueness;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -18,7 +17,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
 
 @javax.ws.rs.Path( "/expand" )
 public class ExpandConcepts {
@@ -32,14 +31,6 @@ public class ExpandConcepts {
 
   private TraversalDescription conceptTraversalDescription;
   private TraversalDescription hairsTraversalDescription;
-
-  private static <E> List<E> makeList(Iterable<E> iter) {
-    List<E> list = new ArrayList<E>();
-    for (E item : iter) {
-      list.add(item);
-    }
-    return list;
-  }
 
   private boolean isPit(Node node) {
     for (Label label: node.getLabels()) {
