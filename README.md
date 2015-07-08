@@ -8,8 +8,6 @@
 
 First, add the following line to `neo4j-server.properties`:
 
-    #Comma separated list of JAXRS packages containing JAXRS Resource,
-    #one package name for each mountpoint.
     org.neo4j.server.thirdparty_jaxrs_classes=org.waag.histograph.plugins=/histograph
 
 Afterwards, clone this repository:
