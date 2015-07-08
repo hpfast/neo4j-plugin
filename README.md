@@ -1,6 +1,6 @@
 # Histograph Neo4j plugin
 
-[Unmanaged Extensions](http://neo4j.com/docs/stable/server-unmanaged-extensions.html for Neo4j v2.2.2. Uses Neo4j's [Traversal Framework Java API](http://neo4j.com/docs/stable/tutorial-traversal-java-api.html) to compute Histograph concepts, and their outgoing relations.
+[Unmanaged Extension](http://neo4j.com/docs/stable/server-unmanaged-extensions.html] for Neo4j v2.2.2. Uses Neo4j's [Traversal Framework Java API](http://neo4j.com/docs/stable/tutorial-traversal-java-api.html) to compute Histograph concepts, and their outgoing relations.
 
 ## Installation
 
