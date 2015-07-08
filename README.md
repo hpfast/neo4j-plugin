@@ -1,12 +1,15 @@
 # Histograph Neo4j plugin
 
-[Unmanaged Extension](http://neo4j.com/docs/stable/server-unmanaged-extensions.html) for Neo4j v2.2.2. Uses Neo4j's [Traversal Framework Java API](http://neo4j.com/docs/stable/tutorial-traversal-java-api.html) to compute Histograph concepts, and their outgoing relations.
+[Unmanaged Extension](http://neo4j.com/docs/stable/server-unmanaged-extensions.html) for Neo4j v2.2.2. Uses Neo4j's [Traversal Framework Java API](http://neo4j.com/docs/stable/tutorial-traversal-java-api.html) to compute Histograph concepts, and their outgoing relations. These outgoing relations will make all concepts nice and hairy.
+
+![](cavia.jpg)
 
 ## Installation
 
 First, add the following line to `neo4j-server.properties`:
 
-    #Comma separated list of JAXRS packages containing JAXRS Resource, one package name for each mountpoint.
+    #Comma separated list of JAXRS packages containing JAXRS Resource,
+    #one package name for each mountpoint.
     org.neo4j.server.thirdparty_jaxrs_classes=org.waag.histograph.plugins=/histograph
 
 Afterwards, clone this repository:
