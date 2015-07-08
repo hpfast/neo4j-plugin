@@ -9,7 +9,21 @@ First, add the following line to `neo4j-server.properties`:
     #Comma separated list of JAXRS packages containing JAXRS Resource, one package name for each mountpoint.
     org.neo4j.server.thirdparty_jaxrs_classes=org.waag.histograph.plugins=/histograph
 
-Afterwards, run `mvn package` and copy JAR file to Neo4j's plugin directory, or run `install.sh` (currently only works under MacOS with a Neo4j installed by Neo4j).
+Afterwards, clone this repository:
+
+    git clone https://github.com/histograph/neo4j-plugin.git
+
+Go to directory:
+
+    cd neo4j-plugin
+
+And build the plugin using Maven:
+
+    mvn package
+
+Then, copy JAR file to Neo4j's plugin directory!
+
+(Or just run `install.sh` (currently only works under MacOS with a Neo4j installed by Neo4j).)
 
 ## Usage
 
