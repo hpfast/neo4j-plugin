@@ -1,23 +1,26 @@
 package org.waag.histograph.plugins;
 
 import org.codehaus.jackson.JsonEncoding;
+import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Traverser;
 import org.neo4j.graphdb.traversal.Uniqueness;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
+
+import javax.ws.rs.core.Context;
 
 @javax.ws.rs.Path( "/expand" )
 public class ExpandConcepts {
@@ -60,48 +63,26 @@ public class ExpandConcepts {
     //.evaluator(Evaluators.excludeStartPosition());
   }
 
-  @GET
+  @POST
   @javax.ws.rs.Path("/")
-  public Response expand() {
+  public Response chips(@Context HttpServletRequest request, final InputStream requestBody) {
     StreamingOutput stream = new StreamingOutput() {
 
       @Override
-      public void write( OutputStream os ) throws IOException, WebApplicationException {
+      public void write(OutputStream os) throws IOException, WebApplicationException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(requestBody));
+        JsonFactory f = new JsonFactory();
+        JsonParser jp = f.createJsonParser(reader);
 
-        // TODO: convert function to POST, accepting JSON of the following form
-        // {
-        //   "ids"
-        //   "geometry"
-        //   "traversalRelations
-        //   "hairRelations"
-        //   "hairy"
-        // }
+        ExpandParameters parameters = objectMapper.readValue(jp, ExpandParameters.class);
 
         JsonGenerator jg = objectMapper.getJsonFactory().createJsonGenerator( os, JsonEncoding.UTF8 );
-        jg.writeStartArray();
-//
-//        String[] ids = {
-//            "urn:hg:geonames:2759794",
-//            "urn:hg:geonames:2753637",
-//            "urn:hg:geonames:2753639",
-//            "urn:hg:geonames:2753638",
-//            "urn:hg:geonames:2753640",
-//            "urn:hg:tgn:7264696",
-//            "urn:hg:tgn:term:1001511217",
-//            "urn:hg:geonames:2753636",
-//            "urn:hg:tgn:7264697",
-//            "urn:hg:tgn:7264700",
-//            "urn:hg:tgn:term:1001493884"
-//        };
-
-        String[] ids = {
-            "urn:hg:geonames:2753638"
-        };
 
         ArrayList<String> visited = new ArrayList<String>();
 
+        jg.writeStartArray();
         try (Transaction tx = graphDb.beginTx()) {
-          for (String id : ids) {
+          for (String id : parameters.ids) {
             if (!visited.contains(id)) {
               Concept concept = new Concept();
 
@@ -171,9 +152,11 @@ public class ExpandConcepts {
         jg.writeEndArray();
         jg.flush();
         jg.close();
-      }
-    };
 
+
+      }
+
+    };
     return Response.ok().entity( stream ).type( MediaType.APPLICATION_JSON ).build();
   }
 }
