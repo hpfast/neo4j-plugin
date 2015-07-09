@@ -177,3 +177,4 @@ Example output of a single street in lovely Bussum. Response is an array of Hist
 ]
 ```
 
+No Guinea Pigs were harmed in the creation of this software.
